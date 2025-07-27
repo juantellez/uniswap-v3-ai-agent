@@ -1,0 +1,26 @@
+# Archivos de configuración con API keys
+config.env
+.env
+*.env
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Node modules
+node_modules/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Credenciales de n8n
+.n8n/
+
+# Archivos de respaldo
+*.backup
+*.bak
