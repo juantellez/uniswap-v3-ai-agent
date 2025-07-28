@@ -1,26 +1,93 @@
-# Archivos de configuración con API keys
-config.env
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+htmlcov/
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments
 .env
-*.env
+.venv
+env/
+venv/
+ENV/
+env.bak
+venv.bak
 
-# Logs
-*.log
-logs/
+# SQLite
+*.db
+*.db-journal
+# Nota: Excluimos la base de datos para no versionar datos de usuario.
+# Si necesitas una base de datos de prueba, inclúyela explícitamente con !data/test.db
 
-# Archivos temporales
-*.tmp
-*.temp
+# Archivos de datos locales y modelos de IA
+/data/*.db
+/models_gguf/
+*.gguf
+# Nota: Excluimos los archivos de modelos GGUF que pueden ser muy pesados.
+# Se deben descargar siguiendo instrucciones en el README.
 
-# Node modules
-node_modules/
+# Archivos de configuración de IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Archivos del sistema
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Credenciales de n8n
-.n8n/
-
-# Archivos de respaldo
-*.backup
-*.bak
+# Alembic - no ignorar la carpeta de versiones
+# pero sí el log si se genera alguno
+alembic.log
