@@ -7,6 +7,9 @@ from alembic import context
 
 from models.base import Base
 from models.wallet import Wallet
+from models.position import Position
+from models.metric import PositionMetric
+from models.recommendation import Recommendation
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

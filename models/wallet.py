@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.sql import func
-from models.base import Base
+from .base import Base
 
 class Wallet(Base):
     __tablename__ = "wallets"

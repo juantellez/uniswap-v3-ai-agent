@@ -4,3 +4,5 @@ pydantic==1.10.13 # Usamos v1 por ahora para compatibilidad con otras libs
 SQLAlchemy
 alembic # Para migraciones de base de datos
 apscheduler # Para planificar tareas
+requests
+llama-cpp-python
