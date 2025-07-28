@@ -88,17 +88,14 @@ class QwenAgent:
         prompt = self._build_prompt(metric)
         
         try:
-            # El cambio CLAVE está en el parámetro 'stop'
             output = self.model(
                 prompt, 
                 max_tokens=2048, 
-                stop=["</final_answer>"],  # <--- ¡LA SOLUCIÓN DEFINITIVA!
+                stop=["</final_answer>"],
                 temperature=0.2, 
                 echo=False
             )
             
-            # La respuesta ahora terminará justo después de la etiqueta que necesitamos.
-            # Le añadimos manualmente la etiqueta de cierre para que nuestro parser funcione.
             raw_text = output['choices'][0]['text'] + "</final_answer>"
             
             return self._parse_output(raw_text)

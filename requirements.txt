@@ -6,3 +6,4 @@ alembic # Para migraciones de base de datos
 apscheduler # Para planificar tareas
 requests
 llama-cpp-python
+python-telegram-bot

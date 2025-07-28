@@ -1,4 +1,5 @@
 from pydantic import BaseSettings
+from typing import Optional
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -7,6 +8,8 @@ class Settings(BaseSettings):
     DEV_MODE_MOCK_API: bool = False # Por defecto, no usar mocks
     MODEL_PATH: str
     N_GPU_LAYERS: int = 0
+    TELEGRAM_BOT_TOKEN: Optional[str] = None
+    TELEGRAM_CHAT_ID: Optional[str] = None
 
     class Config:
         env_file = ".env"

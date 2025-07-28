@@ -14,6 +14,7 @@ from models.position import Position
 from models.metric import PositionMetric
 from modules.qwen_agent import qwen_agent
 from models.recommendation import Recommendation
+from modules.notifier import notifier, format_recommendation_for_telegram
 
 # --- Configuración de Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +25,7 @@ def sync_position_from_api(db_session, wallet: Wallet, api_position: dict):
     """Sincroniza una posición individual desde la API a la BD."""
     token_id = int(api_position.get('token_id'))
     
-    # 1. Busca si la posición ya existe en nuestra BD
+    # 1. Busca si la posición ya existe
     db_position = db_session.query(Position).filter(Position.token_id == token_id).first()
 
     if not db_position:
@@ -40,36 +41,42 @@ def sync_position_from_api(db_session, wallet: Wallet, api_position: dict):
             tick_upper=api_position.get('tick_upper'),
         )
         db_session.add(db_position)
-        db_session.commit() # Commit para que la posición obtenga un ID
+        # No es necesario hacer commit aquí, flush() más tarde es suficiente
     
-    # 3. Crea una nueva entrada de métricas para la posición
-    # Aquí es donde irán los cálculos más complejos. Por ahora, datos básicos.
+    # 3. Crea una nueva entrada de métricas
     current_price = float(api_position.get('pool', {}).get('token0_price'))
     price_lower = float(api_position.get('price_lower'))
     price_upper = float(api_position.get('price_upper'))
 
     new_metric = PositionMetric(
-        position_id=db_position.id,
+        position=db_position, # Asignamos el objeto Position completo
         current_price=current_price,
         price_lower=price_lower,
         price_upper=price_upper,
         is_in_range=(price_lower <= current_price <= price_upper)
-    )    
+    )
     db_session.add(new_metric)
-    db_session.flush() # flush() para asignar un ID a new_metric sin hacer commit
-
+    
     # 4. Generar y guardar recomendación de la IA
     logger.info(f"Generando recomendación de IA para la posición {db_position.token_id}...")
     ai_result = qwen_agent.generate_recommendation(new_metric)
     
     new_recommendation = Recommendation(
-        metric_id=new_metric.id,
+        metric=new_metric,
         recommendation_action=ai_result["action"],
         justification=ai_result["justification"],
         raw_model_output=ai_result["raw_output"]
     )
     db_session.add(new_recommendation)
     logger.info(f"Recomendación de la IA ('{ai_result['action']}') guardada.")
+    
+    # 5. Enviar notificación si es relevante
+    if new_recommendation.recommendation_action != "MAINTAIN":
+        # Ahora new_recommendation tiene acceso a .metric y .metric.position
+        message = format_recommendation_for_telegram(new_recommendation)
+        notifier.send_telegram_message(message)
+    else:
+        logger.info(f"Acción 'MAINTAIN' para la posición {db_position.token_id}. No se enviará notificación.")
 
 
 def scan_positions_task():
@@ -104,7 +111,6 @@ def scan_positions_task():
 
 
 def main():
-    # ... (El resto de la función main se mantiene igual)
     logger.info("Iniciando el Agente de Monitoreo Uniswap V3...")
     
     scheduler = BlockingScheduler(timezone="UTC")
