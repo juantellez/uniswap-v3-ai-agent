@@ -7,3 +7,5 @@ apscheduler # Para planificar tareas
 requests
 llama-cpp-python
 python-telegram-bot
+gql[requests]
+tqdm
