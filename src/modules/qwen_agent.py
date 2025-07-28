@@ -76,40 +76,46 @@ class QwenAgent:
 
 
     def _build_prompt(self, metric: PositionMetric) -> str:
-        # ... (Este método se mantiene igual que la versión "Gold Standard v3") ...
         position = metric.position
+        
         prompt_template = f"""<|im_start|>system
-Eres un analista experto en DeFi. Tu proceso es:
-1.  Primero, razona de forma CONCISA sobre la posición dentro de las etiquetas <thinking>.
-2.  Después, proporciona tu recomendación final como un objeto JSON dentro de las etiquetas <final_answer>.
+        Eres un analista experto en DeFi. Tu proceso es:
+        1.  Primero, razona de forma CONCISA sobre la posición dentro de las etiquetas <thinking>.
+        2.  Después, proporciona tu recomendación final como un objeto JSON dentro de las etiquetas <final_answer>.
 
-**Constraint:** La etiqueta <final_answer> y su contenido JSON DEBEN ser lo último en tu respuesta.<|im_end|>
-<|im_start|>user
-Analiza la siguiente posición:
-- Pool: WBTC/WETH
-- Rango de precios: 15.5000 - 18.5000
-- Precio actual: 19.2000
-- Estado: Fuera de Rango
-<|im_end|>
-<|im_start|>assistant
-<thinking>
-El precio actual está fuera del rango superior. La posición no genera comisiones. Se necesita rebalancear para volver al rango activo.
-</thinking>
-<final_answer>
-{{
-  "action": "REBALANCE",
-  "justification": "El precio actual ha superado el límite superior. Se recomienda rebalancear a un nuevo rango para continuar generando comisiones."
-}}
-</final_answer><|im_end|>
-<|im_start|>user
-Perfecto. Ahora analiza esta nueva posición:
-- Pool: {position.token0_symbol}/{position.token1_symbol}
-- Rango de precios: {metric.price_lower:.4f} - {metric.price_upper:.4f}
-- Precio actual: {metric.current_price:.4f}
-- Estado: {'En Rango' if metric.is_in_range else 'Fuera de Rango'}
-<|im_end|>
-<|im_start|>assistant
-"""
+        **Constraint:** La etiqueta <final_answer> y su contenido JSON DEBEN ser lo último en tu respuesta.<|im_end|>
+        <|im_start|>user
+        Analiza la siguiente posición:
+        - Pool: WBTC/WETH
+        - Rango de precios: 15.5000 - 18.5000
+        - Precio actual: 19.2000
+        - Estado: Fuera de Rango
+        - Pérdida Impermanente (IL): -2.5%
+
+        **Tu Tarea:**
+        Responde con un objeto JSON que contenga "action" y "justification".<|im_end|>
+        <|im_start|>assistant
+        <thinking>
+        El precio actual está fuera del rango superior. La posición no genera comisiones y tiene una pérdida impermanente del 2.5%. Se necesita rebalancear para volver al rango activo.
+        </thinking>
+        <final_answer>
+        {{
+        "action": "REBALANCE",
+        "justification": "El precio actual ha superado el límite superior y la posición tiene una IL de -2.5%. Se recomienda rebalancear para volver a generar comisiones."
+        }}
+        </final_answer><|im_end|>
+        <|im_start|>user
+        Perfecto. Ahora analiza esta nueva posición:
+        - Pool: {position.token0_symbol}/{position.token1_symbol}
+        - Rango de precios: {metric.price_lower:.4f} - {metric.price_upper:.4f}
+        - Precio actual: {metric.current_price:.4f}
+        - Estado: {'En Rango' if metric.is_in_range else 'Fuera de Rango'}
+        - Pérdida Impermanente (IL): {metric.impermanent_loss_percent:.2f}%
+
+        **Tu Tarea:**
+        Responde con un objeto JSON que contenga "action" y "justification".<|im_end|>
+        <|im_start|>assistant
+        """
         return prompt_template
 
     def _parse_output(self, raw_text: str) -> dict:

@@ -1,6 +1,6 @@
 # src/modules/subgraph_client.py
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 from core.config import settings
@@ -19,13 +19,22 @@ class SubgraphClient:
         logger.info(f"SubgraphClient inicializado usando la URL del proyecto de The Graph Studio.")
 
     def get_positions_for_wallet(self, owner_address: str) -> List[Dict[str, Any]]:
+        # Query mejorada para obtener datos necesarios para IL en el futuro
         query = gql("""
             query($owner: String!) {
                 positions(where: {owner: $owner, liquidity_gt: 0}) {
                     id
-                    pool { id, token0 { symbol }, token1 { symbol }, token0Price }
+                    transaction { timestamp }
+                    pool { 
+                        id
+                        token0 { id, symbol }
+                        token1 { id, symbol }
+                        token0Price
+                    }
                     tickLower { tickIdx, price0 }
                     tickUpper { tickIdx, price0 }
+                    depositedToken0
+                    depositedToken1
                 }
             }
         """)
@@ -40,5 +49,4 @@ class SubgraphClient:
             logger.error(f"Error al consultar el Subgraph: {e}", exc_info=True)
             return []
 
-# La instancia se crea con la URL completa y autorizada desde la configuración.
 subgraph_client = SubgraphClient(chain=settings.CHAIN, query_url=settings.THEGRAPH_PROJECT_QUERY_URL)
