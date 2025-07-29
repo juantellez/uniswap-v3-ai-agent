@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # --- Notifications ---
     TELEGRAM_BOT_TOKEN: Optional[str] = None
     TELEGRAM_CHAT_ID: Optional[str] = None
+    
+    ETHERSCAN_API_KEY: Optional[str] = None
+
 
     class Config:
         env_file = os.path.join(PROJECT_ROOT, ".env")

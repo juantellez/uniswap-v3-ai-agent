@@ -15,8 +15,10 @@ class PositionMetric(Base):
     current_price = Column(Float)
     is_in_range = Column(Boolean)
     
-    # --- NUEVO CAMPO ---
     impermanent_loss_percent = Column(Float, nullable=True, default=0.0)
+    
+    unclaimed_fees_usd = Column(Float, nullable=True, default=0.0)
+    real_apr_percent = Column(Float, nullable=True, default=0.0)
     
     snapshot_at = Column(DateTime(timezone=True), server_default=func.now())
     
